@@ -1,2 +1,5 @@
 *.dump
 .vscode/
+
+./main.c
+./main.out

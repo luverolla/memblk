@@ -1,42 +1,108 @@
 #include <stdio.h>
 
-#include "mymem.h"
+#include "memblk.h"
 
-int main()
-{
+typedef struct SmallType {
+    uint8_t a;
+    uint8_t b;
+} SmallType;
 
-    // allocate 4 bytes treating them as array of 8-bit integers
-    // so we have 4 elements
-    uint8_t *four_as_one_ptr = (uint8_t *)mm_malloc(4U);
+typedef struct MediumType {
+    uint8_t eight;
+    uint16_t sixteen;
+    uint8_t eight2;
+} MediumType;
 
-    // allocate 4 bytes treating them as array of 32-bit integers
-    // so we have 1 element
-    uint32_t *four_as_four_ptr = (uint32_t *)mm_malloc(4U);
+typedef struct LargeType {
+    uint8_t eight;
+    uint16_t sixteen;
+    uint32_t thirtytwo;
+    uint8_t eight2;
+} LargeType;
 
-    uint32_t *fifty_uint32_ptr = (uint32_t *)mm_malloc(50U * sizeof(uint32_t));
+int main(int argc, char **argv) {
+    (int)argc;
+    (char **)argv;
 
-    *four_as_four_ptr = 24U;
+    MBK_Init();
 
-    four_as_one_ptr[0] = 1U;
-    four_as_one_ptr[1] = 2U;
-    four_as_one_ptr[2] = 3U;
-    four_as_one_ptr[3] = 4U;
+    // trying to allocate more memory than available in the pool
+    // void *ptr = MBK_Malloc(MBK_POOL_SIZE + 100U);
 
-    for (uint32_t i = 0; i < 50U; i += 1)
-    {
-        fifty_uint32_ptr[i] = 100U + i;
+    uint8_t *ptr8 = MBK_Malloc(4U * sizeof(uint8_t));
+    if (ptr8 == NULL) {
+        printf("Error: ptr8 is NULL\n");
+    } else {
+        for (uint32_t i = 0U; i < 4U; i++) {
+            ptr8[i] = (uint8_t)i;
+        }
+        for (uint32_t i = 0U; i < 4U; i++) {
+            printf("ptr8[%u] = %u\n", i, ptr8[i]);
+        }
     }
 
-    printf("four_as_one_ptr[0] = %u\n", four_as_one_ptr[0]);
-    printf("four_as_one_ptr[1] = %u\n", four_as_one_ptr[1]);
-    printf("four_as_one_ptr[2] = %u\n", four_as_one_ptr[2]);
-    printf("four_as_one_ptr[3] = %u\n", four_as_one_ptr[3]);
-    printf("four_as_four_ptr = %u\n", *four_as_four_ptr);
+    printf("\n");
 
-    printf("\n\n");
-    for (uint32_t i = 0; i < 50U; i += 1)
-    {
-        printf("fifty_uint32_ptr[%u] = %u\n", i, fifty_uint32_ptr[i]);
+    uint32_t *ptr32 = MBK_Malloc(4U * sizeof(uint32_t));
+    if (ptr32 == NULL) {
+        printf("Error: ptr32 is NULL\n");
+    } else {
+        for (uint32_t i = 0U; i < 4U; i++) {
+            ptr32[i] = i * i;
+        }
+        for (uint32_t i = 0U; i < 4U; i++) {
+            printf("ptr32[%u] = %u\n", i, ptr32[i]);
+        }
     }
-    return 0;
+
+    printf("\n");
+
+    SmallType *ptrSmall = MBK_Malloc(4 * sizeof(SmallType));
+    if (ptrSmall == NULL) {
+        printf("Error: ptrSmall is NULL\n");
+    } else {
+        for (uint32_t i = 0U; i < 4U; i++) {
+            ptrSmall[i].a = (uint8_t)i;
+            ptrSmall[i].b = (uint8_t)(i + 1U);
+        }
+        for (uint32_t i = 0U; i < 4U; i++) {
+            printf("ptrSmall[%u].a = %u, ptrSmall[%u].b = %u\n", i, ptrSmall[i].a, i, ptrSmall[i].b);
+        }
+    }
+
+    printf("\n");
+
+    MediumType *ptrMedium = MBK_Malloc(4 * sizeof(MediumType));
+    if (ptrMedium == NULL) {
+        printf("Error: ptrMedium is NULL\n");
+    } else {
+        for (uint32_t i = 0U; i < 4U; i++) {
+            ptrMedium[i].eight = (uint8_t)i;
+            ptrMedium[i].sixteen = (uint16_t)(i + 1U);
+            ptrMedium[i].eight2 = (uint8_t)(i + 2U);
+        }
+        for (uint32_t i = 0U; i < 4U; i++) {
+            printf("ptrMedium[%u].eight = %u, ptrMedium[%u].sixteen = %u, ptrMedium[%u].eight2 = %u\n", i, ptrMedium[i].eight, i, ptrMedium[i].sixteen, i, ptrMedium[i].eight2);
+        }
+    }
+
+    printf("\n");
+
+    LargeType *ptrLarge = MBK_Malloc(4U * sizeof(LargeType));
+    if (ptrLarge == NULL) {
+        printf("Error: ptrLarge is NULL\n");
+    } else {
+        for (uint32_t i = 0U; i < 4U; i++) {
+            ptrLarge[i].eight = (uint8_t)i;
+            ptrLarge[i].sixteen = (uint16_t)(i + 1U);
+            ptrLarge[i].thirtytwo = (uint32_t)(i + 2U);
+            ptrLarge[i].eight2 = (uint8_t)(i + 3U);
+        }
+        for (uint32_t i = 0U; i < 4U; i++) {
+            printf("ptrLarge[%u].eight = %u, ptrLarge[%u].sixteen = %u, ptrLarge[%u].thirtytwo = %u, ptrLarge[%u].eight2 = %u\n", i, ptrLarge[i].eight, i, ptrLarge[i].sixteen, i, ptrLarge[i].thirtytwo, i, ptrLarge[i].eight2);
+        }
+    }
+
+    // trying to free a null pointer
+    MBK_Free(NULL);
 }
