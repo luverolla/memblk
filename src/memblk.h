@@ -41,12 +41,6 @@ typedef enum MBK_Error {
     MBK_ERR_OVERFLOW = 2U, // memory pool overflow
 } MBK_Error;
 
-static const char *MBK_ERROR_MSGS[] = {
-    "OK", // never printed
-    "Invalid pointer",
-    "Trying to allocate more memory than available in the pool",
-};
-
 /**
  * @brief Position of a cell in a memory block
  */
@@ -61,9 +55,9 @@ typedef enum MBK_CellPos {
  * @brief Possible outcomes of MBK_Posac
  */
 typedef enum MBK_PosacOutcome {
-    MBK_POSAC_OK = 0U,      // pointer is valid and free
+    MBK_POSAC_OK = 0U,      // pointer is valid and can be used or freed
     MBK_POSAC_NULL = 1U,    // pointer is not valid because it is NULL
-    MBK_POSAC_NOFREE = 2U,  // pointer is valid but not free
+    MBK_POSAC_FREED = 2U,   // pointer is not valid because it is not allocated
     MBK_POSAC_OUTPOOL = 3U, // pointer is not valid because it is out of pool
     MBK_POSAC_NOHEAD = 4U,  // pointer is valid but it is not the head of the block (it is not safe to free it)
 } MBK_PosacOutcome;
@@ -74,5 +68,8 @@ void MBK_Free(void *ptr);
 void *MBK_Realloc(void *ptr, size_t size);
 void *MBK_Calloc(size_t nmemb, size_t size);
 MBK_PosacOutcome MBK_Posac(void *ptr);
+MBK_Error MBK_GetError(void);
+const char *MBK_ReportError(void);
+void MBK_Dump();
 
 #endif
